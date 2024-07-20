@@ -1,0 +1,48 @@
+Seleziona gli utenti che hanno postato almeno un video
+
+--lo statement SELECT DISTINCT è utilizzato per non mostrare tuple dupplicate. in questo modo si ottengono solamente 25 record. Utilizzando invece il solo SELECT statement, si ottengono 127 tuple
+
+    SELECT DISTINCT u.* 
+    FROM `db_social-platform`.users u 
+    INNER JOIN `db_social-platform`.medias m ON m.user_id =u.id 
+    WHERE m.`type` ='video'
+
+Seleziona tutti i post senza Like (13)
+
+    SELECT *
+    FROM `db_social-platform`.posts p 
+    LEFT JOIN `db_social-platform`.likes l ON l.post_id =p.id
+    WHERE l.post_id IS NULL; 
+
+Conta il numero di like per ogni post (165)
+
+--interrogando il DB avendo come punto di partenza la tabella posts e facendo poi OUTER JOIN con la tabella likes, il risultato sono 165 tuple, come da consegna
+
+    SELECT p.id as post_id, COUNT(l.post_id) AS likes_count
+    FROM `db_social-platform`.posts p 
+    LEFT JOIN `db_social-platform`.likes l ON l.post_id =p.id 
+    GROUP BY p.id
+    ORDER BY likes_count;
+
+--se invece si interroga il DB utilizzando la sola tabella likes, contando post.id, il risultato sono 175 tuple, in quanto nella tabella likes esistono post_id da 166 a 191, inesistenti nella tabella posts
+
+    SELECT l.post_id, COUNT(l.post_id) AS likes_count
+    FROM `db_social-platform`.likes l
+    GROUP BY l.post_id;
+
+Ordina gli utenti per il numero di media caricati (25) 
+
+    SELECT  u.id,u.username, COUNT(m.id) AS media_count
+    FROM `db_social-platform`.users u 
+    INNER JOIN `db_social-platform`.medias m ON m.user_id = u.id 
+    GROUP BY u.id, u.username 
+    ORDER BY media_count ASC;
+
+Ordina gli utenti per totale di likes ricevuti nei loro posts (25) 
+
+    SELECT  l.user_id,u.username, COUNT(l.user_id) AS likes_count
+    FROM `db_social-platform`.likes l 
+    RIGHT JOIN `db_social-platform`.users u ON u.id=l.user_id 
+    GROUP BY l.user_id, u.username 
+    ORDER BY likes_count, u.username;
+
